@@ -1,25 +1,32 @@
-/**
- * @author Rafay Shaikh
- * @author Henry Lee Barton III
- * 
- * @since 10/30/2019
- */
-
 package main;
 
-import java.awt.EventQueue;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.Timer;
+import java.util.TimerTask;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JComboBox;
 import javax.swing.SwingConstants;
 
+/**
+ * Class App is the main class that controls
+ * the application.
+ * 
+ * @author Rafay Shaikh
+ * @author Henry Lee Barton III
+ * 
+ * @since 10/30/2019
+ */
 public class App {
 
 	/// ///////////////////
@@ -28,7 +35,7 @@ public class App {
 	
 	private JFrame frame;
 	private String mapPath = "./src/assets/map.png";
-	private ArrayList<Building> buildings = new ArrayList<Building>();
+	private ArrayList<Building> buildings = new ArrayList<Building>(); 		//holds all buildings objects
 
 	/**
 	 * Launch the application.
@@ -39,7 +46,12 @@ public class App {
 			public void run() {
 				try {
 					App window = new App();
-					window.frame.setVisible(true);
+					//timer to delay the the map until welcome screen completes the animation
+					new Timer().schedule(new TimerTask() {
+						public void run() {
+							window.frame.setVisible(true);
+						}
+					}, 4500);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -51,8 +63,9 @@ public class App {
 	 * Create the application.
 	 */
 	public App() {
-		createBuildings();
-		initialize();
+		createBuildings();	// this will generate buildings objects with the data from text file.
+		welcomeFrame();		// this will generate a welcome scenario before the actual program begins.
+		initialize();		// this will initialize the map program
 	}
 	
 	/// ///////////////////
@@ -75,7 +88,7 @@ public class App {
 						mapData.nextLine(), // Name
 						mapData.nextLine(), // Description
 						mapData.nextLine(),	// Number of rooms
-						"./src/assets/" + (index + 1) + ".png"
+						"./src/assets/" + (index + 1) + ".png" //Map pictures
 				));
 				index++;
 			}
@@ -86,6 +99,7 @@ public class App {
 	
 	/**
 	 * Create string array of building names.
+	 * @return buildingNames that will fill-up the ComboBox
 	 */
 	private String[] getBuildingOptions() {
 		String[] buildingNames = new String[this.buildings.size()];
@@ -96,10 +110,35 @@ public class App {
 	}
 
 	/**
+	 * Welcome Frame is a implementation of proxy design pattern
+	 */
+	void welcomeFrame()  {
+		JFrame welcomeFrame = new JFrame();	//new frame
+		welcomeFrame.setUndecorated(true); // Remove title bar
+		ImageIcon imgThisImg = new ImageIcon("./src/assets/welcome.gif");//to display picture
+		JLabel welcomeData = new JLabel();
+		welcomeData.setIcon(imgThisImg);	//label filled with gif image
+		welcomeFrame.add(welcomeData);
+		welcomeFrame.setSize(482, 311);
+		welcomeFrame.setLocationRelativeTo(null);
+		welcomeFrame.setVisible(true);
+		/*
+		* Timer will wait for animation to display for specific amount of time
+		*then the map program will begin execution
+		*/
+		new Timer().schedule(new TimerTask() {
+			public void run() {
+				// closes the welcome display frame when the actual program begins
+				welcomeFrame.dispose();
+			}
+		}, 4500);
+	}
+
+	/**
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
-		
+
 		// Create JFrame
 		frame = new JFrame("Texas A&M University Corpus Christi Map");
 		frame.setResizable(false);
@@ -127,7 +166,8 @@ public class App {
 		map.setBounds(0, 0, 1080, 720);
 		map.setIcon(new ImageIcon(mapPath));
 		frame.getContentPane().add(map);
-		
+
+		//Written 'Building Description' to display
 		JLabel lblDescription = new JLabel("Building Description:");
 		lblDescription.setBounds(1090, 71, 394, 14);
 		frame.getContentPane().add(lblDescription);
@@ -136,6 +176,33 @@ public class App {
 		buildingDescrption.setVerticalAlignment(SwingConstants.TOP);
 		buildingDescrption.setBounds(1090, 96, 394, 584);
 		frame.getContentPane().add(buildingDescrption);
+
+		//Written prompt to display
+		JLabel lblUrlClick = new JLabel("Click On The Logo For More Information");
+		lblUrlClick.setBounds(1190, 420, 394, 14);
+		frame.getContentPane().add(lblUrlClick);
+
+		//TAMUCC logo where user will click to open university's website
+		ImageIcon logoPic = new ImageIcon("./src/assets/logo.jpg");//to display url logo
+		JLabel lblLogo = new JLabel();
+        lblLogo.setIcon(logoPic);
+		lblLogo.setBounds(1250, 450, logoPic.getIconWidth(), logoPic.getIconHeight());
+		//Mouselistner activates when user click on the logo image.
+		lblLogo.addMouseListener(new MouseAdapter()
+		{
+			@Override
+			public void mouseClicked(MouseEvent m)
+			{
+				try {
+					Desktop desktop = java.awt.Desktop.getDesktop(); //this will open the browser
+					URI oURL = new URI("http://www.tamucc.edu");// with this URL
+					desktop.browse(oURL);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		frame.getContentPane().add(lblLogo);
 		
 		// Create combo box listener
 		comboBox.addActionListener(new ActionListener() {

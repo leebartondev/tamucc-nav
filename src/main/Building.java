@@ -1,12 +1,15 @@
+package main;
+
 /**
+ * Class building represents the buildings
+ * on the TAMUCC map: name, info, and image
+ * path.
+ * 
  * @author Rafay Shaikh
  * @author Henry Lee Barton III
  * 
  * @since 10/30/2019
  */
-
-package main;
-
 public class Building {
 
 	/// ///////////////////
@@ -36,7 +39,7 @@ public class Building {
 	 * Constructor function set name, desc, rooms
 	 * @param name
 	 * @param desc
-	 * @param rooms
+	 * @param numRooms
 	 * @param path
 	 */
 	public Building(String name, String desc, String numRooms, String path) {
